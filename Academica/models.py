@@ -8,6 +8,10 @@ class Carrera(models.Model):
     nombre = models.CharField(max_length=50)
     duracion = models.PositiveSmallIntegerField(default=5)
 
+    def __str__(self):
+        txt = "{0} (Duración: {1} años(s))"
+        return txt.format(self.nombre, self.duracion)
+
 
 class Estudiante(models.Model):
     dni = models.CharField(max_length=8, primary_key=True)
@@ -28,6 +32,14 @@ class Estudiante(models.Model):
         txt = "{0} {1}, {2}"
         return txt.format(self.apellidoPaterno, self.apellidoMaterno, self.nombres)
 
+    def __str__(self):
+        txt = "{0} / Carrera: {1} / Vigencia: {2}"
+        if self.vigencia:
+            estadoEstudiante = "Vigente"
+        else:
+            estadoEstudiante = "De baja"
+        return txt.format(self.nombreCompleto(), self.carrera, estadoEstudiante)
+
 
 class Curso(models.Model):
     codigo = models.CharField(max_length=6, primary_key=True)
@@ -36,7 +48,8 @@ class Curso(models.Model):
     docente = models.CharField(max_length=100)
 
     def __str__(self):
-        return "{0} ({1})".format(self.nombre, self.codigo)
+        txt = "{0} ({1}) / Docente: {2}"
+        return txt.format(self.nombre, self.codigo, self.docente)
 
 
 class Matricula(models.Model):
@@ -46,3 +59,12 @@ class Matricula(models.Model):
     curso = models.ForeignKey(
         Curso, null=False, blank=False, on_delete=models.CASCADE)
     fechaMatricula = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        txt = "{0} matriculad{1} en el curso {2} / Fecha: {3}"
+        if self.estudiante.sexo == 'F':
+            letraSexo = "a"
+        else:
+            letraSexo = "o"
+        fecMat = self.fechaMatricula.strftime("%A %d/%m/%Y %H:%M:%S")
+        return txt.format(self.estudiante.nombreCompleto(), letraSexo, self.curso, fecMat)
